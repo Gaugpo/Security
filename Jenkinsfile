@@ -29,18 +29,18 @@ pipeline {
                 }
             }
         }
-*/
+
         stage('SpotBugs Analysis') {
             steps {
                 sh 'mvn spotbugs:check'
             }
             post {
                 always {
-                    recordIssues(tools: [spotBugs(pattern: '**/target/spotbugsXml.xml')])
+                    recordIssues(tools: [spotBugs(pattern: '/target/spotbugsXml.xml')])
                 }
             }
         }
-
+*/
         stage('PMD Analysis') {
             steps {
                 sh 'mvn pmd:pmd'
