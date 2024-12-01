@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK 11'
+        jdk 'JDK 11' // ou 'JDK 20.0.2' selon votre configuration
         maven 'Maven 3.8.1'
     }
 
@@ -19,13 +19,37 @@ pipeline {
             }
         }
 
-    /*    stage('Unit Tests') {
+        stage('OWASP Dependency Check') {
             steps {
-                sh 'mvn test'
+                dependencyCheck additionalArguments: '--scan target/', odcInstallation: 'OWASP Dependency-Check'
             }
-            post {
-                always {
-                    junit '/target/surefire-reports/.xml'
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube Server') { // Assurez-vous que le nom correspond à votre configuration
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') { // Attendre le résultat de la qualité
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'OK') {
+                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
+                    }
+                }
+            }
+        }
+
+        stage('Checkmarx Scan') {
+            steps {
+                // Remplacez par votre commande Checkmarx
+                script {
+                    // Exemple de commande Checkmarx
+                    sh 'checkmarx-scan-command --project "YourProjectName" --source "src"'
                 }
             }
         }
@@ -34,104 +58,18 @@ pipeline {
             steps {
                 sh 'mvn spotbugs:check'
             }
-            post {
-                always {
-                    recordIssues(tools: [spotBugs(pattern: '/target/spotbugsXml.xml')])
-                }
-            }
         }
-*/
+
         stage('PMD Analysis') {
             steps {
                 sh 'mvn pmd:pmd'
-            }
-            post {
-                always {
-                    recordIssues(tools: [pmdParser(pattern: '**/target/pmd.xml')])
-                }
-            }
-        }
-
-        stage('OWASP Dependency-Check') {
-            steps {
-                dependencyCheck additionalArguments: '--format XML', odcInstallation: 'OWASP Dependency-Check'
-            }
-            post {
-                always {
-                    dependencyCheckPublisher pattern: 'dependency-check-report.xml'
-                }
-            }
-        }
-
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh 'mvn sonar:sonar'
-                }
-            }
-        }
-
-        stage('Checkmarx Scan') {
-            steps {
-                step([$class: 'CxScanBuilder',
-                      comment: '',
-                      credentialsId: '',
-                      excludeFolders: '',
-                      excludeOpenSourceFolders: '',
-                      exclusionsSetting: 'global',
-                      failBuildOnNewResults: false,
-                      failBuildOnNewSeverity: 'HIGH',
-                      filterPattern: '''!**/_cvs/**/*, !**/.svn/**/*,
-                         !**/.hg/**/*,   !**/.git/**/*,  !**/.bzr/**/*,
-                         !**/bin/**/*,
-                         !**/obj/**/*,
-                         !**/backup/**/*,
-                         !**/.idea/**/*, !**/*.DS_Store,
-                         !**/*.ipr,  !**/*.iws,
-                         !**/*.bak,   !**/*.tmp,
-                         !**/*.aac,   !**/*.aif,  !**/*.iff,
-                         !**/*.m3u,   !**/*.mid,  !**/*.mp3,
-                         !**/*.mpa,   !**/*.ra,   !**/*.wav,
-                         !**/*.wma,   !**/*.3g2,  !**/*.3gp,
-                         !**/*.asf,   !**/*.asx,  !**/*.avi,
-                         !**/*.flv,   !**/*.mov,  !**/*.mp4,
-                         !**/*.mpg,   !**/*.rm,   !**/*.swf,
-                         !**/*.vob,   !**/*.wmv,  !**/*.bmp,
-                         !**/*.gif,   !**/*.jpg,  !**/*.png,
-                         !**/*.psd,   !**/*.tif,  !**/*.swf,
-                         !**/*.jar,   !**/*.zip,
-                         !**/*.rar,   !**/*.exe,  !**/*.dll,
-                         !**/*.pdb,   !**/*.7z,   !**/*.gz,
-                         !**/*.tar.gz,!**/*.tar,  !**/*.gz,
-                         !**/*.ahtm,  !**/*.ahtml,!**/*.fhtml,
-                         !**/*.hdm,   !**/*.hdml, !**/*.hsql,
-                         !**/*.ht,    !**/*.hta,  !**/*.htc,
-                         !**/*.htd,   !**/*.war,  !**/*.ear,
-                         !**/*.htmls, !**/*.ihtml,!**/*.mht,
-                         !**/*.mhtm,  !**/*.mhtml,!**/*.ssi,
-                         !**/*.stm,   !**/*.stml, !**/*.ttml,
-                         !**/*.txn,   !**/*.xhtm, !**/*.xhtml,
-                         !**/*.class, !**/*.iml,  !Checkmarx/Reports/*.*''',
-                      fullScanCycle: 10,
-                      groupId: '1',
-                      includeOpenSourceFolders: '',
-                      osaArchiveIncludePatterns: '*.zip, *.war, *.ear, *.tgz',
-                      password: '{XXXXXXXX}',
-                      preset: '36',
-                      projectName: 'YourProjectName',
-                      sastEnabled: true,
-                      serverUrl: 'http://localhost:8080',
-                      sourceEncoding: '1',
-                      username: '',
-                      vulnerabilityThresholdResult: 'FAILURE',
-                      waitForResultsEnabled: true])
             }
         }
     }
 
     post {
         always {
-            recordIssues enabledForFailure: true, tools: [mavenConsole(), java(), javaDoc()]
+            echo 'Pipeline finished'
         }
         success {
             echo 'Pipeline succeeded'
