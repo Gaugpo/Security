@@ -2,7 +2,7 @@ import java.sql.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.nio.charset.StandardCharsets; // Import pour utiliser StandardCharsets
+import java.nio.charset.StandardCharsets;
 
 public class UserService {
     private static final String DB_URL = "jdbc:sqlite:users.db";
@@ -77,7 +77,7 @@ public class UserService {
     private String hashPassword(String password) {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8)); // Utilisation de UTF-8
+            byte[] hash = md.digest(password.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
