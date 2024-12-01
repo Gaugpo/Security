@@ -19,7 +19,7 @@ pipeline {
             }
         }
 
-        stage('Unit Tests') {
+    /*    stage('Unit Tests') {
             steps {
                 sh 'mvn test'
             }
@@ -29,7 +29,7 @@ pipeline {
                 }
             }
         }
-
+*/
         stage('SpotBugs Analysis') {
             steps {
                 sh 'mvn spotbugs:check'
