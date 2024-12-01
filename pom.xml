@@ -11,9 +11,9 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <dependency.check.version>7.0.4</dependency.check.version> <!-- Version d'OWASP Dependency-Check -->
-        <spotbugs.version>4.5.0</spotbugs.version> <!-- Version de SpotBugs -->
-        <junit.version>5.8.2</junit.version> <!-- Version de JUnit -->
+        <dependency.check.version>7.3.2</dependency.check.version> <!-- Version mise à jour -->
+        <spotbugs.version>4.5.0</spotbugs.version>
+        <junit.version>5.8.2</junit.version>
     </properties>
 
     <dependencies>
@@ -92,6 +92,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
+                            <!-- Remplacez par votre classe principale -->
                             <mainClass>YourMainClassHere</mainClass><!-- Remplacez par votre classe principale -->
                         </manifest>
                     </archive>
@@ -105,4 +106,15 @@
     <!-- Informations sur le projet -->
     <description>User Service for managing users with security features.</description>
 
+    <!-- Ajout d'un dépôt pour les plugins si nécessaire -->
+    <!--
+    Uncomment this section if needed
+    -->
+    <!--<pluginRepositories>-->
+    <!--<pluginRepository>-->
+    <!--<id>owasp-repo</id>-->
+    <!--<url>https://repo1.maven.org/maven2</url>-->
+    //</pluginRepository>-->
+    //</pluginRepositories>-->
+    
 </project>
