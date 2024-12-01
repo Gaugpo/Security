@@ -1,49 +1,108 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
-         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>UserServiceSecurity</artifactId>
+    <artifactId>UserService</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <dependency.check.version>7.0.4</dependency.check.version> <!-- Version d'OWASP Dependency-Check -->
+        <spotbugs.version>4.5.0</spotbugs.version> <!-- Version de SpotBugs -->
+        <junit.version>5.8.2</junit.version> <!-- Version de JUnit -->
     </properties>
 
     <dependencies>
+        <!-- Dépendance pour JUnit 5 -->
         <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.36.0.3</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
-        <!-- Ajoutez d'autres dépendances si nécessaire -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Autres dépendances nécessaires -->
+        <dependency>
+            <groupId>org.xerial.sqlite-jdbc</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.36.0.3</version> <!-- Vérifiez la dernière version -->
+        </dependency>
+
+        <!-- Ajoutez d'autres dépendances selon vos besoins -->
     </dependencies>
 
     <build>
         <plugins>
+            <!-- Plugin pour OWASP Dependency-Check -->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <release>11</release>
-                </configuration>
+                <groupId>org.owasp.dependencycheck</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${dependency.check.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
+
+            <!-- Plugin pour SpotBugs -->
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.5.3.0</version>
+                <version>${spotbugs.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
+
+            <!-- Plugin pour compiler avec Maven -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.15.0</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version><!-- Vérifiez la dernière version -->
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
             </plugin>
-            <!-- Ajoutez d'autres plugins si nécessaire -->
+
+            <!-- Plugin pour créer un JAR exécutable -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version><!-- Vérifiez la dernière version -->
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>YourMainClassHere</mainClass><!-- Remplacez par votre classe principale -->
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+
         </plugins>
+
     </build>
+
+    <!-- Informations sur le projet -->
+    <description>User Service for managing users with security features.</description>
+
 </project>
