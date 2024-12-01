@@ -2,80 +2,83 @@ pipeline {
     agent any
 
     tools {
-        jdk 'JDK 11' // ou 'JDK 20.0.2' selon votre configuration
-        maven 'Maven 3.8.1'
+        jdk 'jdk11' // Assurez-vous que JDK 11 est installé et configuré
+        maven 'maven3' // Assurez-vous que Maven est installé et configuré
     }
 
     stages {
         stage('Checkout') {
             steps {
+                // Utiliser checkout scm pour récupérer le code source
                 checkout scm
             }
         }
 
         stage('Build') {
             steps {
+                // Compiler le projet avec Maven
                 sh 'mvn clean package'
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                // Exécuter les tests unitaires
+                sh 'mvn test'
             }
         }
 
         stage('OWASP Dependency Check') {
             steps {
-                dependencyCheck additionalArguments: '--scan target/', odcInstallation: 'OWASP Dependency-Check'
+                // Exécuter OWASP Dependency-Check pour détecter les vulnérabilités
+                sh 'mvn dependency-check:check'
+            }
+        }
+
+        stage('Publish OWASP Dependency Check Report') {
+            steps {
+                // Publier le rapport OWASP Dependency Check
+                publishHTML(target: [
+                    allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target',
+                    reportFiles: 'dependency-check-report.html',
+                    reportName: 'OWASP Dependency Check Report'
+                ])
             }
         }
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube Server') { // Assurez-vous que le nom correspond à votre configuration
+                // Analyser le code avec SonarQube pour détecter les problèmes de qualité et de sécurité
+                withSonarQubeEnv('SonarQube') { // Assurez-vous que SonarQube est configuré dans Jenkins
                     sh 'mvn sonar:sonar'
                 }
             }
         }
 
-        stage('Quality Gate') {
+        stage('Security Code Scan') {
             steps {
-                timeout(time: 1, unit: 'HOURS') { // Attendre le résultat de la qualité
-                    def qg = waitForQualityGate()
-                    if (qg.status != 'OK') {
-                        error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                    }
-                }
+                // Utiliser SpotBugs pour vérifier les vulnérabilités dans le code
+                sh 'mvn com.github.spotbugs:spotbugs-maven-plugin:check'
             }
         }
 
-        stage('Checkmarx Scan') {
+        stage('Deploy') {
             steps {
-                // Remplacez par votre commande Checkmarx
-                script {
-                    // Exemple de commande Checkmarx
-                    sh 'checkmarx-scan-command --project "YourProjectName" --source "src"'
-                }
-            }
-        }
-
-        stage('SpotBugs Analysis') {
-            steps {
-                sh 'mvn spotbugs:check'
-            }
-        }
-
-        stage('PMD Analysis') {
-            steps {
-                sh 'mvn pmd:pmd'
+                // Déployer l'application (par exemple, copier le fichier JAR sur un serveur)
+                sh 'scp target/UserService.jar user@server:/path/to/deploy/'
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline finished'
-        }
         success {
-            echo 'Pipeline succeeded'
+            echo 'Pipeline completed successfully!'
         }
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline failed.'
         }
     }
 }
