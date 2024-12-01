@@ -11,9 +11,9 @@
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <dependency.check.version>7.3.2</dependency.check.version> <!-- Version mise à jour -->
-        <spotbugs.version>4.5.0</spotbugs.version>
-        <junit.version>5.8.2</junit.version>
+        <dependency.check.version>7.3.2</dependency.check.version> <!-- Version d'OWASP Dependency-Check -->
+        <spotbugs.version>4.5.0</spotbugs.version> <!-- Version de SpotBugs -->
+        <junit.version>5.8.2</junit.version> <!-- Version de JUnit -->
     </properties>
 
     <dependencies>
@@ -31,14 +31,14 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Autres dépendances nécessaires -->
+        <!-- Dépendance pour SQLite JDBC -->
         <dependency>
             <groupId>org.xerial.sqlite-jdbc</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.36.0.3</version> <!-- Vérifiez la dernière version -->
         </dependency>
 
-        <!-- Ajoutez d'autres dépendances selon vos besoins -->
+        <!-- Ajoutez d'autres dépendances si nécessaire -->
     </dependencies>
 
     <build>
@@ -90,10 +90,8 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
                             <!-- Remplacez par votre classe principale -->
-                            <mainClass>YourMainClassHere</mainClass><!-- Remplacez par votre classe principale -->
+                            <mainClass>com.example.UserService</mainClass><!-- Modifiez ceci avec le nom complet de votre classe principale -->
                         </manifest>
                     </archive>
                 </configuration>
@@ -106,10 +104,7 @@
     <!-- Informations sur le projet -->
     <description>User Service for managing users with security features.</description>
 
-    <!-- Ajout d'un dépôt pour les plugins si nécessaire -->
-    <!--
-    Uncomment this section if needed
-    -->
+    <!-- Si besoin, ajoutez un dépôt pour les plugins ici (décommenter si nécessaire) -->
     <!--<pluginRepositories>-->
     <!--<pluginRepository>-->
     <!--<id>owasp-repo</id>-->
