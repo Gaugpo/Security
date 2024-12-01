@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        jdk 'jdk11' // Assurez-vous que JDK 11 est installé et configuré
-        maven 'maven3' // Assurez-vous que Maven est installé et configuré
+        jdk 'JDK 11' // Assurez-vous que JDK 11 est installé et configuré
+        maven 'Maven 3.8.1' // Assurez-vous que Maven est installé et configuré
     }
 
     stages {
